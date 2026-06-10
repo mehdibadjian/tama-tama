@@ -347,7 +347,7 @@ export default function MathQuizPage() {
   const pct      = (answered / allProbs.length) * 100;
 
   return (
-    <main className="min-h-screen flex flex-col p-6" style={{ background: '#7DD3FC' }}>
+    <main className="h-dvh flex flex-col p-6 overflow-hidden" style={{ background: '#7DD3FC' }}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button onClick={() => router.push('/math')} className="text-white text-2xl font-black w-10 h-10 flex items-center justify-center">←</button>
@@ -360,7 +360,8 @@ export default function MathQuizPage() {
         <motion.div className="h-3 rounded-full" style={{ backgroundColor: lesson.color }} animate={{ width: `${pct}%` }} transition={{ duration: 0.4 }} />
       </div>
 
-      {/* Problem card + abacus */}
+      {/* Problem card + abacus — scrollable so it never pushes answer buttons off screen */}
+      <div className="flex-1 min-h-0 overflow-y-auto pb-4">
       <AnimatePresence mode="wait">
         {current && (
           <motion.div
@@ -368,7 +369,7 @@ export default function MathQuizPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="bg-white rounded-3xl shadow-2xl p-6 mb-5 flex flex-col items-center gap-4"
+            className="bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center gap-4"
           >
             <button
               onClick={() => {
@@ -400,9 +401,10 @@ export default function MathQuizPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
-      {/* Answer choices */}
-      <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto w-full">
+      {/* Answer choices — always pinned at bottom */}
+      <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto w-full flex-shrink-0">
         {choices.map((val) => {
           const isSelected = selected === val;
           const correct    = isSelected && state === 'correct';

@@ -149,7 +149,7 @@ export default function MatchPage() {
   const pct = (answered / lessonVocab.length) * 100;
 
   return (
-    <main className="min-h-screen bg-tama-blue flex flex-col p-6">
+    <main className="h-dvh bg-tama-blue flex flex-col p-6 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button
@@ -196,7 +196,7 @@ export default function MatchPage() {
       </AnimatePresence>
 
       {/* Choice cards */}
-      <div className="flex flex-col gap-4 items-center flex-1 justify-center">
+      <div className="flex flex-col gap-4 items-center flex-1 min-h-0 justify-center overflow-hidden">
         {choices.map((vocab) => {
           const isSelected = selected === vocab.id;
           const correct = isSelected && roundState === 'correct';

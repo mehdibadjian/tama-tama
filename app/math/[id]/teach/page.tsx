@@ -118,7 +118,7 @@ export default function TeachPage() {
   const pct = ((idx + 1) / slides.length) * 100;
 
   return (
-    <main className="min-h-screen flex flex-col p-6" style={{ background: '#7DD3FC' }}>
+    <main className="h-dvh flex flex-col p-6 overflow-hidden" style={{ background: '#7DD3FC' }}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button
@@ -151,7 +151,7 @@ export default function TeachPage() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -40 }}
           transition={{ duration: 0.25 }}
-          className="bg-white rounded-3xl shadow-2xl p-6 flex flex-col gap-5 flex-1"
+          className="bg-white rounded-3xl shadow-2xl p-6 flex flex-col gap-5 flex-1 min-h-0 overflow-y-auto"
         >
           {/* Chinese term */}
           <button
@@ -200,10 +200,10 @@ export default function TeachPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Next button */}
+      {/* Next button — always pinned at bottom */}
       <motion.button
         onClick={next}
-        className="mt-6 text-white font-black text-xl py-4 rounded-2xl shadow-xl w-full"
+        className="mt-4 flex-shrink-0 text-white font-black text-xl py-4 rounded-2xl shadow-xl w-full"
         style={{ backgroundColor: lesson.color }}
         whileTap={{ scale: 0.95 }}
       >

@@ -37,7 +37,7 @@ export default function TracePage() {
   const allHeard = lessonVocab.every(v => heard.has(v.id));
 
   return (
-    <main className="min-h-screen bg-tama-blue flex flex-col p-6 pb-10">
+    <main className="h-dvh bg-tama-blue flex flex-col p-6 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button
@@ -67,8 +67,9 @@ export default function TracePage() {
         Tap any word to hear it!
       </p>
 
-      {/* Grid of vocab cards */}
-      <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full">
+      {/* Grid of vocab cards — scrolls inside the viewport */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto w-full pb-2">
         {lessonVocab.map((vocab) => {
           const done = heard.has(vocab.id);
           return (
@@ -100,15 +101,16 @@ export default function TracePage() {
           );
         })}
       </div>
+      </div>
 
-      {/* Done CTA — appears once all words have been heard at least once */}
+      {/* Done CTA — pinned below the grid, slides up when all words heard */}
       <AnimatePresence>
         {allHeard && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center gap-3 mt-8"
+            className="flex flex-col items-center gap-3 pt-4 pb-2 flex-shrink-0"
           >
             <p className="text-white font-black text-lg">You heard them all! 🎉</p>
             <button
