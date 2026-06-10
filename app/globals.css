@@ -18,7 +18,14 @@
 
 :root {
   /* Force light mode — no dark theme in a kids' app */
-  color-scheme: light only;
+  color-scheme: only light;
+}
+
+/* Belt-and-suspenders: prevent Firefox/Chrome auto-dark-mode from inverting anything */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: only light;
+  }
 }
 
 * {
