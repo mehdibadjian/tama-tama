@@ -21,10 +21,21 @@
   color-scheme: only light;
 }
 
-/* Belt-and-suspenders: prevent Firefox/Chrome auto-dark-mode from inverting anything */
+/* Firefox Android "Auto Dark Mode" applies a CSS filter even when color-scheme is set.
+   Explicitly reset filter and restore all tama colors inside the dark media query. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  html, body {
     color-scheme: only light;
+    filter: none !important;
+    background-color: #7DD3FC !important;
+  }
+  /* Restore every tama custom property to its original value so no variable gets remapped */
+  :root {
+    --color-tama-pink:   #FF8EAF !important;
+    --color-tama-purple: #A855F7 !important;
+    --color-tama-blue:   #7DD3FC !important;
+    --color-tama-white:  #FAFAFA !important;
+    --color-tama-ink:    #334155 !important;
   }
 }
 

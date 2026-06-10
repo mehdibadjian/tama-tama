@@ -44,8 +44,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${nunito.variable} h-full`}>
-      <body className="min-h-full select-none">{children}</body>
+    <html lang="en" className={`${nunito.variable} h-full`} style={{ colorScheme: 'light', background: '#7DD3FC' }}>
+      <body className="min-h-full select-none" style={{ background: '#7DD3FC' }}>{children}</body>
     </html>
   );
 }
