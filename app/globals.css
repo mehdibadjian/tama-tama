@@ -16,6 +16,11 @@
   --radius-3xl:     2.5rem;
 }
 
+:root {
+  /* Force light mode — no dark theme in a kids' app */
+  color-scheme: light only;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
