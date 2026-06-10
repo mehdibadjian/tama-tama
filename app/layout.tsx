@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { RegisterSW } from "@/components/RegisterSW";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -45,7 +46,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${nunito.variable} h-full`} style={{ colorScheme: 'light', background: '#7DD3FC' }}>
-      <body className="min-h-full select-none" style={{ background: '#7DD3FC' }}>{children}</body>
+      <body className="min-h-full select-none" style={{ background: '#7DD3FC' }}>
+        <RegisterSW />
+        {children}
+      </body>
     </html>
   );
 }

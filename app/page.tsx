@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { TamaCharacter } from '@/components/TamaCharacter';
+import { Emoji } from '@/components/Emoji';
 import { useSpeech } from '@/hooks/useSpeech';
 
 export default function SplashPage() {
@@ -53,7 +54,7 @@ export default function SplashPage() {
           className="bg-tama-pink text-white text-xl font-black py-5 rounded-2xl shadow-2xl flex items-center justify-center gap-3"
           whileTap={{ scale: 0.93 }}
         >
-          <span className="text-2xl">🈶</span> Mandarin
+          <Emoji emoji="🈶" size={26} /> Mandarin
         </motion.button>
 
         <motion.button
@@ -62,7 +63,7 @@ export default function SplashPage() {
           style={{ backgroundColor: '#FB923C' }}
           whileTap={{ scale: 0.93 }}
         >
-          <span className="text-2xl">🧮</span> 心算 Math
+          <Emoji emoji="🧮" size={26} /> 心算 Math
         </motion.button>
       </motion.div>
 

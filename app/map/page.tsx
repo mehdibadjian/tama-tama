@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LESSONS } from '@/lib/seed-data';
+import { Emoji } from '@/components/Emoji';
 import { getProgress } from '@/lib/progress';
 import type { LessonProgress } from '@/lib/types';
 
@@ -67,7 +68,7 @@ export default function MapPage() {
                   }
                   transition={{ repeat: Infinity, duration: 2.5 }}
                 >
-                  <span className="text-4xl">{lesson.emoji}</span>
+                  <Emoji emoji={lesson.emoji} size={40} />
                   <div className="flex-1 text-left">
                     <div className="font-black text-lg leading-tight">{lesson.title}</div>
                     <div className="text-sm font-semibold opacity-60">{lesson.titleZh}</div>

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VOCAB, LESSONS } from '@/lib/seed-data';
+import { Emoji } from '@/components/Emoji';
 import { setLessonProgress } from '@/lib/progress';
 import { useSpeech } from '@/hooks/useSpeech';
 import type { VocabItem } from '@/lib/types';
@@ -223,7 +224,7 @@ export default function MatchPage() {
               transition={{ duration: 0.35 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-5xl">{vocab.emoji}</span>
+              <Emoji emoji={vocab.emoji} size={52} />
               <div className="flex-1 text-left">
                 <div className="text-3xl font-black leading-tight">{vocab.hanzi}</div>
                 <div className="text-sm font-semibold opacity-60">{vocab.pinyin}</div>

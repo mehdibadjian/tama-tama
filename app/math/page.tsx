@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { MATH_LESSONS } from '@/lib/math-data';
+import { Emoji } from '@/components/Emoji';
 import { getMathProgress } from '@/lib/progress';
 import type { LessonProgress } from '@/lib/types';
 
@@ -62,7 +63,7 @@ export default function MathMapPage() {
                   animate={unlocked && !completed ? { scale: [1, 1.015, 1] } : {}}
                   transition={{ repeat: Infinity, duration: 2.5 }}
                 >
-                  <span className="text-4xl">{lesson.emoji}</span>
+                  <Emoji emoji={lesson.emoji} size={40} />
                   <div className="flex-1 text-left">
                     <div className="font-black text-lg leading-tight">{lesson.title}</div>
                     <div className="text-sm font-semibold opacity-60">{lesson.titleZh} · {lesson.pinyin}</div>
