@@ -188,20 +188,6 @@ export const TEACH_SLIDES: Record<number, TeachSlide[]> = {
 
 // ── Quiz problems ────────────────────────────────────────────────────────────────
 
-function choices(answer: number, op: '+' | '-' | '×' | '÷'): number[] {
-  const offsets = op === '×' || op === '÷' ? [1, 2, 3] : [1, 2, 3];
-  const wrong = new Set<number>();
-  for (const o of offsets) {
-    if (answer - o > 0) wrong.add(answer - o);
-    wrong.add(answer + o);
-    if (wrong.size >= 3) break;
-  }
-  // Fill if needed
-  let i = 4;
-  while (wrong.size < 3) { wrong.add(answer + i++); }
-  return [...wrong].slice(0, 3);
-}
-
 function prob(
   id: number, a: number, op: '+' | '-' | '×' | '÷', b: number,
   rhyme?: string, rhymePinyin?: string
@@ -215,34 +201,50 @@ function prob(
 }
 
 export const MATH_PROBLEMS: Record<number, MathProblem[]> = {
+  // Addition — up to 100
   1: [
-    prob(1,  1, '+', 2), prob(2,  2, '+', 3), prob(3,  3, '+', 3),
-    prob(4,  1, '+', 4), prob(5,  2, '+', 5), prob(6,  3, '+', 4),
-    prob(7,  4, '+', 4), prob(8,  3, '+', 6), prob(9,  4, '+', 5),
-    prob(10, 5, '+', 5),
+    prob(1,  1, '+',  2), prob(2,  4, '+',  3), prob(3,  7, '+',  6),
+    prob(4,  9, '+',  8), prob(5,  8, '+',  7), prob(6, 12, '+',  5),
+    prob(7, 15, '+',  8), prob(8, 14, '+', 17), prob(9, 23, '+', 14),
+    prob(10, 25, '+', 35), prob(11, 34, '+', 28), prob(12, 47, '+', 36),
+    prob(13, 52, '+', 38), prob(14, 64, '+', 27), prob(15, 45, '+', 48),
   ],
+  // Subtraction — up to 100
   2: [
-    prob(1,  5, '-', 2), prob(2,  7, '-', 3), prob(3,  6, '-', 2),
-    prob(4,  8, '-', 5), prob(5, 10, '-', 3), prob(6,  9, '-', 4),
-    prob(7,  7, '-', 4), prob(8,  8, '-', 3), prob(9, 10, '-', 6),
-    prob(10, 9, '-', 5),
+    prob(1,   8, '-',  3), prob(2,  12, '-',  7), prob(3,  15, '-',  8),
+    prob(4,  17, '-',  9), prob(5,  20, '-',  6), prob(6,  25, '-', 13),
+    prob(7,  32, '-', 17), prob(8,  40, '-', 24), prob(9,  50, '-', 23),
+    prob(10, 63, '-', 35), prob(11, 72, '-', 48), prob(12, 80, '-', 37),
+    prob(13, 85, '-', 46), prob(14, 91, '-', 45), prob(15, 100, '-', 42),
   ],
+  // Multiplication — 九九表 2–7
   3: [
-    prob(1,  2, '×', 2, '二二得四',   'èr èr dé sì'),
-    prob(2,  2, '×', 3, '二三得六',   'èr sān dé liù'),
-    prob(3,  2, '×', 4, '二四得八',   'èr sì dé bā'),
-    prob(4,  2, '×', 5, '二五一十',   'èr wǔ yī shí'),
-    prob(5,  3, '×', 3, '三三得九',   'sān sān dé jiǔ'),
-    prob(6,  3, '×', 4, '三四十二',   'sān sì shí\'èr'),
-    prob(7,  3, '×', 5, '三五十五',   'sān wǔ shíwǔ'),
-    prob(8,  4, '×', 4, '四四十六',   'sì sì shíliù'),
-    prob(9,  4, '×', 5, '四五二十',   'sì wǔ èrshí'),
-    prob(10, 5, '×', 5, '五五二十五', 'wǔ wǔ èrshíwǔ'),
+    prob(1,  2, '×', 2,  '二二得四',   'èr èr dé sì'),
+    prob(2,  2, '×', 3,  '二三得六',   'èr sān dé liù'),
+    prob(3,  2, '×', 4,  '二四得八',   'èr sì dé bā'),
+    prob(4,  2, '×', 5,  '二五一十',   'èr wǔ yī shí'),
+    prob(5,  3, '×', 3,  '三三得九',   'sān sān dé jiǔ'),
+    prob(6,  3, '×', 4,  '三四十二',   "sān sì shí'èr"),
+    prob(7,  3, '×', 5,  '三五十五',   'sān wǔ shíwǔ'),
+    prob(8,  4, '×', 4,  '四四十六',   'sì sì shíliù'),
+    prob(9,  4, '×', 5,  '四五二十',   'sì wǔ èrshí'),
+    prob(10, 5, '×', 5,  '五五二十五', 'wǔ wǔ èrshíwǔ'),
+    prob(11, 2, '×', 6,  '二六十二',   "èr liù shí'èr"),
+    prob(12, 3, '×', 6,  '三六十八',   'sān liù shíbā'),
+    prob(13, 4, '×', 6,  '四六二十四', 'sì liù èrshísì'),
+    prob(14, 5, '×', 6,  '五六三十',   'wǔ liù sānshí'),
+    prob(15, 3, '×', 7,  '三七二十一', 'sān qī èrshíyī'),
+    prob(16, 4, '×', 7,  '四七二十八', 'sì qī èrshíbā'),
+    prob(17, 5, '×', 7,  '五七三十五', 'wǔ qī sānshíwǔ'),
+    prob(18, 6, '×', 6,  '六六三十六', 'liù liù sānshíliù'),
   ],
+  // Division — derived from multiplication table
   4: [
-    prob(1,   4, '÷', 2), prob(2,  6, '÷', 2), prob(3,  8, '÷', 2),
-    prob(4,  10, '÷', 2), prob(5,  9, '÷', 3), prob(6, 12, '÷', 3),
-    prob(7,  15, '÷', 3), prob(8, 16, '÷', 4), prob(9, 20, '÷', 4),
-    prob(10, 25, '÷', 5),
+    prob(1,   4, '÷', 2), prob(2,   6, '÷', 2), prob(3,   8, '÷', 2),
+    prob(4,  10, '÷', 2), prob(5,   9, '÷', 3), prob(6,  12, '÷', 3),
+    prob(7,  15, '÷', 3), prob(8,  16, '÷', 4), prob(9,  20, '÷', 4),
+    prob(10, 25, '÷', 5), prob(11, 12, '÷', 2), prob(12, 18, '÷', 3),
+    prob(13, 24, '÷', 4), prob(14, 30, '÷', 5), prob(15, 18, '÷', 6),
+    prob(16, 21, '÷', 3), prob(17, 28, '÷', 4), prob(18, 35, '÷', 5),
   ],
 };

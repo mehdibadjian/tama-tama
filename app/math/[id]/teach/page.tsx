@@ -5,15 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MATH_LESSONS, TEACH_SLIDES } from '@/lib/math-data';
 import { useSpeech } from '@/hooks/useSpeech';
 
-function BeadRow({ count, color }: { count: number; color: string }) {
+function BeadRow({ count, color, baseDelay = 0 }: { count: number; color: string; baseDelay?: number }) {
   return (
-    <div className="flex gap-1.5 justify-center flex-wrap">
+    <div className="flex gap-1.5 justify-center items-center flex-wrap">
       {Array.from({ length: count }).map((_, i) => (
         <motion.div
           key={i}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: i * 0.06, type: 'spring', bounce: 0.5 }}
+          initial={{ x: 24, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: baseDelay + i * 0.07, type: 'spring', stiffness: 180, damping: 14 }}
           className="w-8 h-8 rounded-full shadow-md"
           style={{ backgroundColor: color }}
         />
@@ -22,22 +22,74 @@ function BeadRow({ count, color }: { count: number; color: string }) {
   );
 }
 
-function BeadVisual({ groups, color }: { groups: number[]; color: string }) {
-  const ops = ['+', '+', '+'];
-  const total = groups.reduce((s, n) => s + n, 0);
+function BeadVisual({ groups, color, lessonId }: { groups: number[]; color: string; lessonId: number }) {
+  const isSubtraction = lessonId === 2;
+  const secondary = '#FBBF24';
+  const removed   = '#9CA3AF';
+
+  const total = isSubtraction ? groups[0] : groups.reduce((s, n) => s + n, 0);
+
+  let runningDelay = 0;
+  const rowDelays = groups.map(n => {
+    const d = runningDelay;
+    runningDelay += n * 0.07 + 0.15;
+    return d;
+  });
+
   return (
-    <div className="flex flex-col items-center gap-3 bg-white/20 rounded-2xl p-4 w-full">
-      <div className="flex items-center gap-3 flex-wrap justify-center">
-        {groups.map((n, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <BeadRow count={n} color={color} />
-            {i < groups.length - 1 && (
-              <span className="text-2xl font-black text-white">{ops[i]}</span>
-            )}
-          </div>
-        ))}
+    <div className="flex flex-col items-center gap-2 w-full">
+      {/* Abacus frame */}
+      <div className="w-full rounded-2xl p-4 border-2 border-amber-800/25" style={{ background: 'rgba(120,53,15,0.12)' }}>
+        <div className="h-2 bg-amber-800/40 rounded-full mb-3" />
+
+        <div className="flex flex-col gap-3">
+          {groups.map((n, i) => {
+            const beadColor = isSubtraction && i === 1 ? removed
+              : groups.length > 1 && i % 2 === 1 ? secondary
+              : color;
+
+            return (
+              <div key={i} className="relative flex items-center gap-2 flex-wrap">
+                {/* rod */}
+                <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-amber-900/20 rounded-full -z-10" />
+                <BeadRow count={n} color={beadColor} baseDelay={rowDelays[i]} />
+                {i < groups.length - 1 && !isSubtraction && (
+                  <motion.span
+                    className="text-white font-black text-xl z-10"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: rowDelays[i] + n * 0.07 + 0.05, type: 'spring' }}
+                  >
+                    +
+                  </motion.span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="h-2 bg-amber-800/40 rounded-full mt-3" />
       </div>
-      <div className="text-white/60 font-black text-lg">= {total}</div>
+
+      {isSubtraction && groups.length === 2 && (
+        <motion.p
+          className="text-white/60 text-xs font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: rowDelays[1] + groups[1] * 0.07 + 0.1 }}
+        >
+          {groups[1]} taken away — {groups[0]} remain
+        </motion.p>
+      )}
+
+      <motion.div
+        className="text-white font-black text-2xl"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: runningDelay }}
+      >
+        = {total}
+      </motion.div>
     </div>
   );
 }
@@ -117,7 +169,7 @@ export default function TeachPage() {
 
           {/* Bead visual */}
           {slide.beadGroups && slide.beadGroups.length > 0 && (
-            <BeadVisual groups={slide.beadGroups} color={lesson.color} />
+            <BeadVisual groups={slide.beadGroups} color={lesson.color} lessonId={lessonId} />
           )}
 
           {/* Nine-Nine Rhyme entries */}

@@ -26,6 +26,226 @@ function buildChoices(answer: number): number[] {
   return shuffle([answer, ...wrongChoices(answer)]);
 }
 
+// ── Abacus components ────────────────────────────────────────────────────────
+
+function Bead({ color, delay, sz }: { color: string; delay: number; sz: string }) {
+  return (
+    <motion.div
+      className={`${sz} rounded-full shadow`}
+      style={{ backgroundColor: color }}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay, type: 'spring', bounce: 0.5, stiffness: 260 }}
+    />
+  );
+}
+
+function TenBlock({ color, delay }: { color: string; delay: number }) {
+  return (
+    <motion.div
+      className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-[10px] shadow border-2 border-white/40 leading-none"
+      style={{ backgroundColor: color }}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay, type: 'spring', bounce: 0.4, stiffness: 200 }}
+    >
+      10
+    </motion.div>
+  );
+}
+
+// Renders n as ten-blocks + unit beads, returns total animation duration
+function NumberBeads({
+  value,
+  color,
+  baseDelay = 0,
+  unitSz = 'w-6 h-6',
+}: {
+  value: number;
+  color: string;
+  baseDelay?: number;
+  unitSz?: string;
+}) {
+  if (value <= 0) return null;
+  const tens = Math.floor(value / 10);
+  const ones = value % 10;
+  const items: React.ReactNode[] = [];
+  let d = baseDelay;
+
+  for (let i = 0; i < tens; i++) {
+    items.push(<TenBlock key={`t${i}`} color={color} delay={d} />);
+    d += 0.055;
+  }
+  if (tens > 0 && ones > 0) {
+    items.push(
+      <motion.span
+        key="sep"
+        className="text-white/40 text-xs font-bold"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: d }}
+      >
+        +
+      </motion.span>
+    );
+  }
+  for (let i = 0; i < ones; i++) {
+    items.push(<Bead key={`o${i}`} color={color} delay={d} sz={unitSz} />);
+    d += 0.055;
+  }
+
+  return <div className="flex items-center gap-1.5 flex-wrap justify-center">{items}</div>;
+}
+
+// Total delay needed for n items starting at baseDelay
+function totalDelay(value: number, baseDelay: number): number {
+  const count = Math.floor(value / 10) + (value % 10);
+  return baseDelay + count * 0.055 + 0.1;
+}
+
+function QuizAbacus({
+  a, b, op, color,
+}: {
+  a: number; b: number; op: '+' | '-' | '×' | '÷'; color: string;
+}) {
+  const secondary = '#FBBF24';
+  const gray      = '#9CA3AF';
+
+  if (op === '+') {
+    const afterA = totalDelay(a, 0.1);
+    return (
+      <div className="bg-white/20 rounded-2xl p-4 flex flex-col items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap justify-center">
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-white/70 font-bold text-sm">{a}</span>
+            <NumberBeads value={a} color={color} baseDelay={0.1} />
+          </div>
+          <motion.span
+            className="text-white text-2xl font-black"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: afterA - 0.05, type: 'spring' }}
+          >
+            +
+          </motion.span>
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-white/70 font-bold text-sm">{b}</span>
+            <NumberBeads value={b} color={secondary} baseDelay={afterA} />
+          </div>
+        </div>
+        <motion.p
+          className="text-white/50 text-xs font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: totalDelay(b, afterA) }}
+        >
+          Count all the beads together!
+        </motion.p>
+      </div>
+    );
+  }
+
+  if (op === '-') {
+    const afterRemain = totalDelay(a - b, 0.1);
+    return (
+      <div className="bg-white/20 rounded-2xl p-4 flex flex-col items-center gap-3">
+        <span className="text-white/70 font-bold text-sm">Start with {a}</span>
+        <NumberBeads value={a - b} color={color} baseDelay={0.1} />
+        <motion.div
+          className="flex flex-col items-center gap-1.5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: afterRemain }}
+        >
+          <span className="text-white/50 text-xs font-semibold">take away {b} →</span>
+          <NumberBeads value={b} color={gray} baseDelay={afterRemain + 0.05} />
+        </motion.div>
+        <motion.p
+          className="text-white/50 text-xs font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: totalDelay(b, afterRemain + 0.05) }}
+        >
+          How many {color === gray ? '' : '🔵'} beads are left?
+        </motion.p>
+      </div>
+    );
+  }
+
+  if (op === '×') {
+    const numGroups = a;
+    const perGroup  = b;
+    const sz = perGroup <= 5 ? 'w-6 h-6' : perGroup <= 7 ? 'w-5 h-5' : 'w-4 h-4';
+    return (
+      <div className="bg-white/20 rounded-2xl p-4 flex flex-col items-center gap-2">
+        <span className="text-white/70 font-bold text-sm">{numGroups} groups of {perGroup}</span>
+        <div className="flex flex-col gap-1.5">
+          {Array.from({ length: numGroups }).map((_, gi) => (
+            <div key={gi} className="flex items-center gap-1">
+              {Array.from({ length: perGroup }).map((_, bi) => (
+                <Bead
+                  key={bi}
+                  color={gi % 2 === 0 ? color : secondary}
+                  delay={gi * 0.18 + bi * 0.06 + 0.1}
+                  sz={sz}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+        <motion.p
+          className="text-white/50 text-xs font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: numGroups * 0.18 + perGroup * 0.06 + 0.2 }}
+        >
+          Count all the beads!
+        </motion.p>
+      </div>
+    );
+  }
+
+  if (op === '÷') {
+    const numGroups = b;
+    return (
+      <div className="bg-white/20 rounded-2xl p-4 flex flex-col items-center gap-3">
+        <span className="text-white/70 font-bold text-sm">Share {a} into {numGroups} groups</span>
+        <NumberBeads value={a} color={color} baseDelay={0.1} />
+        <motion.div
+          className="flex gap-2 flex-wrap justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: totalDelay(a, 0.1) }}
+        >
+          {Array.from({ length: numGroups }).map((_, gi) => (
+            <motion.div
+              key={gi}
+              className="w-11 h-11 rounded-xl border-2 border-dashed border-white/50 flex items-center justify-center"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: totalDelay(a, 0.1) + gi * 0.1, type: 'spring', bounce: 0.5 }}
+            >
+              <span className="text-white/60 font-black text-lg">?</span>
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.p
+          className="text-white/50 text-xs font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: totalDelay(a, 0.1) + numGroups * 0.1 + 0.15 }}
+        >
+          How many beads in each box?
+        </motion.p>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// ── Quiz page ────────────────────────────────────────────────────────────────
+
 type State = 'idle' | 'correct' | 'wrong';
 
 export default function MathQuizPage() {
@@ -51,9 +271,8 @@ export default function MathQuizPage() {
     setChoices(buildChoices(p.answer));
     setSelected(null);
     setState('idle');
-    const prompt = p.op === '×' && p.rhyme
-      ? `What is ${p.a} times ${p.b}?`
-      : `What is ${p.a} ${p.op === '+' ? 'plus' : p.op === '-' ? 'minus' : p.op === '×' ? 'times' : 'divided by'} ${p.b}?`;
+    const opWord = p.op === '+' ? 'plus' : p.op === '-' ? 'minus' : p.op === '×' ? 'times' : 'divided by';
+    const prompt = `What is ${p.a} ${opWord} ${p.b}?`;
     timer.current = setTimeout(() => speakEnglish(prompt), 400);
   }
 
@@ -138,7 +357,7 @@ export default function MathQuizPage() {
         <motion.div className="h-3 rounded-full" style={{ backgroundColor: lesson.color }} animate={{ width: `${pct}%` }} transition={{ duration: 0.4 }} />
       </div>
 
-      {/* Problem display */}
+      {/* Problem card + abacus */}
       <AnimatePresence mode="wait">
         {current && (
           <motion.div
@@ -146,21 +365,23 @@ export default function MathQuizPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="bg-white rounded-3xl shadow-2xl p-8 mb-6 flex flex-col items-center gap-3"
+            className="bg-white rounded-3xl shadow-2xl p-6 mb-5 flex flex-col items-center gap-4"
           >
             <button
               onClick={() => {
-                const prompt = `What is ${current.a} ${current.op === '+' ? 'plus' : current.op === '-' ? 'minus' : current.op === '×' ? 'times' : 'divided by'} ${current.b}?`;
-                speakEnglish(prompt);
+                const opWord = current.op === '+' ? 'plus' : current.op === '-' ? 'minus' : current.op === '×' ? 'times' : 'divided by';
+                speakEnglish(`What is ${current.a} ${opWord} ${current.b}?`);
               }}
               className="text-tama-purple/40 text-2xl"
             >
               🔊
             </button>
-            <div className="text-6xl font-black text-tama-ink">
+
+            <div className="text-5xl font-black text-tama-ink">
               {current.a} {current.op} {current.b} = ?
             </div>
-            {/* Show Nine-Nine rhyme hint for multiplication */}
+
+            {/* Nine-Nine rhyme hint for multiplication */}
             {current.rhyme && (
               <button
                 onClick={() => speakMandarin(current.rhyme!)}
@@ -170,6 +391,9 @@ export default function MathQuizPage() {
                 <span className="block text-xs font-semibold text-tama-purple/60">{current.rhymePinyin}</span>
               </button>
             )}
+
+            {/* Animated abacus visual */}
+            <QuizAbacus a={current.a} b={current.b} op={current.op} color={lesson.color} />
           </motion.div>
         )}
       </AnimatePresence>
