@@ -1,0 +1,13 @@
+{
+  "name": "Tama-Tama",
+  "short_name": "Tama-Tama",
+  "description": "Learn Mandarin with your virtual pet!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7DD3FC",
+  "theme_color": "#7DD3FC",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/tama-tama.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
