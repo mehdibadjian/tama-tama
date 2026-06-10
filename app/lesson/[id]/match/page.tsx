@@ -105,12 +105,11 @@ export default function MatchPage() {
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', bounce: 0.6 }}
-          className="text-8xl"
         >
-          🎉
+          <Emoji emoji="🎉" size={80} />
         </motion.div>
         <h2 className="text-3xl font-black text-white text-center">Amazing job!</h2>
-        <div className="flex gap-1 text-4xl">
+        <div className="flex gap-1">
           {[1, 2, 3].map(i => (
             <motion.span
               key={i}
@@ -118,7 +117,7 @@ export default function MatchPage() {
               animate={{ scale: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.15, type: 'spring' }}
             >
-              ⭐
+              <Emoji emoji="⭐" size={40} />
             </motion.span>
           ))}
         </div>
@@ -159,8 +158,8 @@ export default function MatchPage() {
         >
           ←
         </button>
-        <h1 className="text-lg font-black text-white flex-1">
-          {lesson.emoji} {lesson.title}
+        <h1 className="text-lg font-black text-white flex-1 flex items-center gap-1.5">
+          <Emoji emoji={lesson.emoji} size={20} /> {lesson.title}
         </h1>
         <div className="text-white font-bold text-sm">
           {answered}/{lessonVocab.length}

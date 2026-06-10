@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LESSONS, VOCAB } from '@/lib/seed-data';
+import { Emoji } from '@/components/Emoji';
 import { getProgress } from '@/lib/progress';
 import type { VocabItem, LessonProgress } from '@/lib/types';
 
@@ -135,7 +136,7 @@ export default function ParentPage() {
               const p = progress.find(x => x.lessonId === lesson.id);
               return (
                 <div key={lesson.id} className="flex items-center gap-3">
-                  <span className="text-2xl">{lesson.emoji}</span>
+                  <Emoji emoji={lesson.emoji} size={24} />
                   <span className="font-semibold text-tama-ink flex-1">{lesson.title}</span>
                   <span className="text-lg">
                     {p?.completed ? '⭐'.repeat(p.stars) : <span className="text-tama-ink/30 text-sm">not started</span>}
@@ -162,7 +163,7 @@ export default function ParentPage() {
                     : 'bg-tama-blue/20 text-tama-ink'
                 }`}
               >
-                {l.emoji} {l.title}
+                <Emoji emoji={l.emoji} size={16} className="mr-1" /> {l.title}
               </button>
             ))}
           </div>
@@ -208,7 +209,7 @@ export default function ParentPage() {
             <div className="mt-2 flex flex-col gap-1">
               {lessonSeeded.map(v => (
                 <div key={v.id} className="flex items-center gap-2 text-sm text-tama-ink/60">
-                  <span>{v.emoji}</span>
+                  <Emoji emoji={v.emoji} size={18} />
                   <span className="font-black text-tama-ink">{v.hanzi}</span>
                   <span>{v.pinyin}</span>
                   <span className="flex-1">{v.english}</span>
@@ -225,7 +226,7 @@ export default function ParentPage() {
               </p>
               {lessonCustom.map(v => (
                 <div key={v.id} className="flex items-center gap-2 py-1">
-                  <span>{v.emoji}</span>
+                  <Emoji emoji={v.emoji} size={18} />
                   <span className="font-black text-tama-ink">{v.hanzi}</span>
                   <span className="text-tama-ink/60">{v.pinyin}</span>
                   <span className="text-tama-ink/40 flex-1">{v.english}</span>

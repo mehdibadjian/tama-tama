@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VOCAB, LESSONS } from '@/lib/seed-data';
+import { Emoji } from '@/components/Emoji';
 import { useSpeech } from '@/hooks/useSpeech';
 import type { VocabItem } from '@/lib/types';
 
@@ -46,7 +47,7 @@ export default function TracePage() {
           ←
         </button>
         <h1 className="text-lg font-black text-white flex-1">
-          {lesson.emoji} Listen &amp; Trace
+          <Emoji emoji={lesson.emoji} size={20} className="mr-1" /> Listen &amp; Trace
         </h1>
         <div className="text-white font-bold text-sm">
           {heard.size}/{lessonVocab.length}
@@ -83,7 +84,7 @@ export default function TracePage() {
               animate={done ? { scale: [1, 1.06, 1] } : {}}
               transition={{ duration: 0.3 }}
             >
-              <span className="text-4xl">{vocab.emoji}</span>
+              <Emoji emoji={vocab.emoji} size={40} />
               <span className="text-3xl font-black leading-tight">{vocab.hanzi}</span>
               <span className={`text-xs font-bold ${done ? 'text-white/80' : 'text-tama-purple'}`}>
                 {vocab.pinyin}
@@ -144,7 +145,7 @@ export default function TracePage() {
               onClick={(e) => { e.stopPropagation(); handleCardTap(active); }}
               className="bg-tama-white rounded-3xl border-4 border-tama-purple p-10 flex flex-col items-center gap-4 cursor-pointer"
             >
-              <span className="text-8xl">{active.emoji}</span>
+              <Emoji emoji={active.emoji} size={80} />
               <span className="text-[100px] leading-none font-black text-tama-ink select-none">
                 {active.hanzi}
               </span>

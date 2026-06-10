@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MATH_LESSONS, TEACH_SLIDES } from '@/lib/math-data';
+import { Emoji } from '@/components/Emoji';
 import { useSpeech } from '@/hooks/useSpeech';
 
 function BeadRow({ count, color, baseDelay = 0 }: { count: number; color: string; baseDelay?: number }) {
@@ -127,7 +128,7 @@ export default function TeachPage() {
           ←
         </button>
         <h1 className="text-lg font-black text-white flex-1">
-          {lesson.emoji} {lesson.title} — Learn
+          <Emoji emoji={lesson.emoji} size={20} className="mr-1" /> {lesson.title} — Learn
         </h1>
         <div className="text-white font-bold text-sm">{idx + 1}/{slides.length}</div>
       </div>

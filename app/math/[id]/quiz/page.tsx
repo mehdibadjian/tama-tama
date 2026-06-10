@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MATH_LESSONS, MATH_PROBLEMS } from '@/lib/math-data';
+import { Emoji } from '@/components/Emoji';
 import { setMathProgress } from '@/lib/progress';
 import { useSpeech } from '@/hooks/useSpeech';
 import type { MathProblem } from '@/lib/math-data';
@@ -323,12 +324,14 @@ export default function MathQuizPage() {
   if (done) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: '#7DD3FC' }}>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }} className="text-8xl">🎉</motion.div>
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}><Emoji emoji="🎉" size={80} /></motion.div>
         <h2 className="text-3xl font-black text-white text-center">Brilliant!</h2>
         <p className="text-white/70 font-semibold">{score}/{allProbs.length} correct</p>
-        <div className="flex gap-1 text-4xl">
+        <div className="flex gap-1">
           {[1, 2, 3].map(i => (
-            <motion.span key={i} initial={{ scale: 0, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ delay: i * 0.15, type: 'spring' }}>⭐</motion.span>
+            <motion.span key={i} initial={{ scale: 0, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ delay: i * 0.15, type: 'spring' }}>
+              <Emoji emoji="⭐" size={40} />
+            </motion.span>
           ))}
         </div>
         <div className="flex gap-3 mt-2">
@@ -348,7 +351,7 @@ export default function MathQuizPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button onClick={() => router.push('/math')} className="text-white text-2xl font-black w-10 h-10 flex items-center justify-center">←</button>
-        <h1 className="text-lg font-black text-white flex-1">{lesson.emoji} {lesson.title} — Quiz</h1>
+        <h1 className="text-lg font-black text-white flex-1 flex items-center gap-1.5"><Emoji emoji={lesson.emoji} size={20} /> {lesson.title} — Quiz</h1>
         <div className="text-white font-bold text-sm">{answered}/{allProbs.length}</div>
       </div>
 
