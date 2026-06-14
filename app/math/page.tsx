@@ -37,7 +37,7 @@ export default function MathMapPage() {
         </div>
 
         <div className="bg-white/20 rounded-2xl p-4 mb-6 text-white text-sm font-semibold leading-relaxed">
-          🧮 Chinese kids use the <span className="font-black">Mental Abacus</span> and the <span className="font-black">Nine-Nine Song</span> to solve big problems in seconds. Learn the method, then take the quiz!
+          🧮 Chinese kids use the <span className="font-black">Mental Abacus</span> and the <span className="font-black">Nine-Nine Song</span> to solve big problems in seconds. Tap a topic to take the quiz, or <span className="font-black">📖 Learn</span> the method any time.
         </div>
 
         <div className="flex flex-col items-center gap-2">
@@ -51,27 +51,47 @@ export default function MathMapPage() {
                 {index > 0 && (
                   <div className={`w-2 h-8 rounded-full transition-colors ${completed ? 'bg-white/60' : 'bg-white/20'}`} />
                 )}
-                <motion.button
-                  onClick={() => unlocked && router.push(`/math/${lesson.id}/teach`)}
-                  className={`w-full max-w-xs p-5 rounded-2xl shadow-lg flex items-center gap-4 transition-colors ${
+                <motion.div
+                  className={`w-full max-w-xs rounded-2xl shadow-lg flex items-stretch overflow-hidden transition-colors ${
                     completed  ? 'text-white'
                     : unlocked ? 'bg-white text-tama-ink'
-                    :            'bg-white/25 text-white/40 cursor-default'
+                    :            'bg-white/25 text-white/40'
                   }`}
                   style={completed ? { backgroundColor: lesson.color } : {}}
-                  whileTap={unlocked ? { scale: 0.95 } : {}}
                   animate={unlocked && !completed ? { scale: [1, 1.015, 1] } : {}}
                   transition={{ repeat: Infinity, duration: 2.5 }}
                 >
-                  <Emoji emoji={lesson.emoji} size={40} />
-                  <div className="flex-1 text-left">
-                    <div className="font-black text-lg leading-tight">{lesson.title}</div>
-                    <div className="text-sm font-semibold opacity-60">{lesson.titleZh} · {lesson.pinyin}</div>
-                  </div>
-                  {completed  && <span className="text-xl">{'⭐'.repeat(lp?.stars ?? 1)}</span>}
-                  {!unlocked  && <span className="text-xl">🔒</span>}
-                  {unlocked && !completed && <span className="text-xl" style={{ color: lesson.color }}>▶</span>}
-                </motion.button>
+                  {/* Main tap → straight to the quiz */}
+                  <motion.button
+                    onClick={() => unlocked && router.push(`/math/${lesson.id}/quiz`)}
+                    disabled={!unlocked}
+                    className="flex-1 p-5 flex items-center gap-4 text-left"
+                    whileTap={unlocked ? { scale: 0.95 } : {}}
+                  >
+                    <Emoji emoji={lesson.emoji} size={40} />
+                    <div className="flex-1">
+                      <div className="font-black text-lg leading-tight">{lesson.title}</div>
+                      <div className="text-sm font-semibold opacity-60">{lesson.titleZh} · {lesson.pinyin}</div>
+                    </div>
+                    {completed  && <span className="text-xl">{'⭐'.repeat(lp?.stars ?? 1)}</span>}
+                    {!unlocked  && <span className="text-xl">🔒</span>}
+                    {unlocked && !completed && <span className="text-xl" style={{ color: lesson.color }}>▶</span>}
+                  </motion.button>
+
+                  {/* Learn the method — on demand, not forced */}
+                  {unlocked && (
+                    <button
+                      onClick={() => router.push(`/math/${lesson.id}/teach`)}
+                      className={`w-16 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold border-l-2 ${
+                        completed ? 'border-white/30 text-white' : 'border-tama-blue/15 text-tama-purple'
+                      }`}
+                      aria-label={`Learn ${lesson.title}`}
+                    >
+                      <span className="text-xl">📖</span>
+                      Learn
+                    </button>
+                  )}
+                </motion.div>
               </div>
             );
           })}

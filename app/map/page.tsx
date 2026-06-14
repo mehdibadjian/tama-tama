@@ -51,16 +51,14 @@ export default function MapPage() {
                   />
                 )}
 
-                <motion.button
-                  onClick={() => unlocked && router.push(`/lesson/${lesson.id}/trace`)}
-                  className={`w-full max-w-xs p-5 rounded-2xl shadow-lg flex items-center gap-4 transition-colors ${
+                <motion.div
+                  className={`w-full max-w-xs rounded-2xl shadow-lg flex items-stretch overflow-hidden transition-colors ${
                     completed
                       ? 'bg-tama-pink text-white'
                       : unlocked
                       ? 'bg-white text-tama-ink'
-                      : 'bg-white/25 text-white/40 cursor-default'
+                      : 'bg-white/25 text-white/40'
                   }`}
-                  whileTap={unlocked ? { scale: 0.95 } : {}}
                   animate={
                     unlocked && !completed
                       ? { scale: [1, 1.015, 1] }
@@ -68,19 +66,41 @@ export default function MapPage() {
                   }
                   transition={{ repeat: Infinity, duration: 2.5 }}
                 >
-                  <Emoji emoji={lesson.emoji} size={40} />
-                  <div className="flex-1 text-left">
-                    <div className="font-black text-lg leading-tight">{lesson.title}</div>
-                    <div className="text-sm font-semibold opacity-60">{lesson.titleZh}</div>
-                  </div>
-                  {completed && (
-                    <span className="text-xl">{'⭐'.repeat(lp?.stars ?? 1)}</span>
+                  {/* Main tap → straight to the matching game */}
+                  <motion.button
+                    onClick={() => unlocked && router.push(`/lesson/${lesson.id}/match`)}
+                    disabled={!unlocked}
+                    className="flex-1 p-5 flex items-center gap-4 text-left"
+                    whileTap={unlocked ? { scale: 0.95 } : {}}
+                  >
+                    <Emoji emoji={lesson.emoji} size={40} />
+                    <div className="flex-1">
+                      <div className="font-black text-lg leading-tight">{lesson.title}</div>
+                      <div className="text-sm font-semibold opacity-60">{lesson.titleZh}</div>
+                    </div>
+                    {completed && (
+                      <span className="text-xl">{'⭐'.repeat(lp?.stars ?? 1)}</span>
+                    )}
+                    {!unlocked && <span className="text-xl">🔒</span>}
+                    {unlocked && !completed && (
+                      <span className="text-tama-purple text-xl">▶</span>
+                    )}
+                  </motion.button>
+
+                  {/* Practice writing — on demand, not forced */}
+                  {unlocked && (
+                    <button
+                      onClick={() => router.push(`/lesson/${lesson.id}/trace`)}
+                      className={`w-16 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold border-l-2 ${
+                        completed ? 'border-white/30 text-white' : 'border-tama-blue/15 text-tama-purple'
+                      }`}
+                      aria-label={`Practice writing ${lesson.title}`}
+                    >
+                      <span className="text-xl">✏️</span>
+                      Write
+                    </button>
                   )}
-                  {!unlocked && <span className="text-xl">🔒</span>}
-                  {unlocked && !completed && (
-                    <span className="text-tama-purple text-xl">▶</span>
-                  )}
-                </motion.button>
+                </motion.div>
               </div>
             );
           })}
