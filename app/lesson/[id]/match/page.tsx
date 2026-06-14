@@ -195,47 +195,72 @@ export default function MatchPage() {
         )}
       </AnimatePresence>
 
-      {/* Choice cards */}
+      {/* Flash cards — the picture stays hidden on the back so the child has to
+          read the Chinese word, not just match the emoji. It flips into view
+          only after a choice is made, to confirm and teach. */}
       <div className="flex flex-col gap-4 items-center flex-1 min-h-0 justify-center overflow-hidden">
         {choices.map((vocab) => {
           const isSelected = selected === vocab.id;
           const correct = isSelected && roundState === 'correct';
           const wrong   = isSelected && roundState === 'wrong';
+          // Reveal the hidden picture once this card has been chosen.
+          const revealed = isSelected;
 
           return (
             <motion.div
               key={vocab.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => handleSelect(vocab)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSelect(vocab)}
-              className={`w-full max-w-xs p-5 rounded-2xl shadow-lg border-4 flex items-center gap-4 transition-colors cursor-pointer ${
-                correct
-                  ? 'bg-tama-pink border-tama-pink text-white'
-                  : wrong
-                  ? 'bg-white border-gray-200 text-tama-ink'
-                  : 'bg-tama-white border-tama-purple text-tama-ink'
-              }`}
+              className="w-full max-w-xs"
+              style={{ perspective: 1000 }}
               animate={
                 wrong   ? { x: [-10, 10, -8, 8, 0] } :
                 correct ? { scale: [1, 1.06, 1] }    : {}
               }
               transition={{ duration: 0.35 }}
-              whileTap={{ scale: 0.95 }}
             >
-              <Emoji emoji={vocab.emoji} size={52} />
-              <div className="flex-1 text-left">
-                <div className="text-3xl font-black leading-tight">{vocab.hanzi}</div>
-                <div className="text-sm font-semibold opacity-60">{vocab.pinyin}</div>
-              </div>
-              {correct && <span className="text-2xl">✓</span>}
-              <button
-                onClick={(e) => { e.stopPropagation(); speakMandarin(vocab.hanzi); }}
-                className="text-tama-purple opacity-50 text-xl ml-1"
-                aria-label={`Hear ${vocab.hanzi}`}
+              <motion.div
+                role="button"
+                tabIndex={0}
+                onClick={() => handleSelect(vocab)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSelect(vocab)}
+                className="relative w-full h-24 cursor-pointer"
+                style={{ transformStyle: 'preserve-3d' }}
+                animate={{ rotateY: revealed ? 180 : 0 }}
+                transition={{ duration: 0.5 }}
+                whileTap={{ scale: 0.96 }}
               >
-                🔊
-              </button>
+                {/* Front — only the Chinese word the child must read */}
+                <div
+                  className="absolute inset-0 rounded-2xl shadow-lg border-4 border-tama-purple bg-tama-white text-tama-ink flex items-center justify-between px-5"
+                  style={{ backfaceVisibility: 'hidden' }}
+                >
+                  <div className="flex-1 text-left">
+                    <div className="text-4xl font-black leading-tight">{vocab.hanzi}</div>
+                    <div className="text-sm font-semibold opacity-60">{vocab.pinyin}</div>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); speakMandarin(vocab.hanzi); }}
+                    className="text-tama-purple opacity-50 text-2xl"
+                    aria-label={`Hear ${vocab.hanzi}`}
+                  >
+                    🔊
+                  </button>
+                </div>
+
+                {/* Back — the picture hidden behind the card */}
+                <div
+                  className={`absolute inset-0 rounded-2xl shadow-lg border-4 flex items-center justify-center gap-3 ${
+                    correct
+                      ? 'bg-tama-pink border-tama-pink text-white'
+                      : wrong
+                      ? 'bg-white border-gray-200 text-tama-ink'
+                      : 'bg-tama-white border-tama-purple text-tama-ink'
+                  }`}
+                  style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                >
+                  <Emoji emoji={vocab.emoji} size={52} />
+                  {correct && <span className="text-3xl">✓</span>}
+                </div>
+              </motion.div>
             </motion.div>
           );
         })}
