@@ -230,16 +230,16 @@ export default function MatchPage() {
               >
                 {/* Front — only the Chinese word the child must read */}
                 <div
-                  className="absolute inset-0 rounded-2xl shadow-lg border-4 border-tama-purple bg-tama-white text-tama-ink flex items-center overflow-hidden"
+                  className="absolute inset-0 rounded-2xl shadow-lg border-4 border-tama-purple bg-tama-white text-tama-ink flex items-stretch overflow-hidden"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
-                  <div className="flex-1 text-left pl-5">
-                    <div className="text-4xl font-black leading-tight">{vocab.hanzi}</div>
-                    <div className="text-sm font-semibold opacity-60">{vocab.pinyin}</div>
+                  <div className="flex-1 flex flex-col items-center justify-center pl-6">
+                    <div className="text-5xl font-black leading-none">{vocab.hanzi}</div>
+                    <div className="text-sm font-semibold opacity-50 mt-1">{vocab.pinyin}</div>
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); speakMandarin(vocab.hanzi); }}
-                    className="self-stretch px-6 flex items-center justify-center text-4xl text-tama-purple bg-tama-purple/10"
+                    className="w-20 flex items-center justify-center text-3xl text-tama-purple bg-tama-purple/10 border-l-2 border-tama-purple/20 active:bg-tama-purple/20"
                     aria-label={`Hear ${vocab.hanzi}`}
                   >
                     🔊
