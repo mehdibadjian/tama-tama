@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MATH_LESSONS, MATH_PROBLEMS } from '@/lib/math-data';
+import { MATH_LESSONS, generateProblems, loadMathSettings } from '@/lib/math-data';
 import { Emoji } from '@/components/Emoji';
 import { setMathProgress } from '@/lib/progress';
 import { useSpeech } from '@/hooks/useSpeech';
@@ -256,8 +256,8 @@ export default function MathQuizPage() {
   const { speakEnglish, speakMandarin } = useSpeech();
 
   const lesson   = MATH_LESSONS.find(l => l.id === lessonId);
-  const allProbs = MATH_PROBLEMS[lessonId] ?? [];
 
+  const [problems, setProblems] = useState<MathProblem[]>([]);
   const [queue,    setQueue]    = useState<MathProblem[]>([]);
   const [choices,  setChoices]  = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
@@ -278,7 +278,9 @@ export default function MathQuizPage() {
   }
 
   useEffect(() => {
-    const q = shuffle(allProbs);
+    const generated = generateProblems(lessonId, loadMathSettings());
+    setProblems(generated);
+    const q = shuffle(generated);
     setQueue(q);
     loadRound(q);
     return () => { if (timer.current) clearTimeout(timer.current); };
@@ -307,12 +309,14 @@ export default function MathQuizPage() {
 
   useEffect(() => {
     if (!done) return;
-    const stars = score === allProbs.length ? 3 : score >= Math.ceil(allProbs.length * 0.6) ? 2 : 1;
+    const stars = score === problems.length ? 3 : score >= Math.ceil(problems.length * 0.6) ? 2 : 1;
     setMathProgress(lessonId, stars);
-  }, [done, lessonId, score, allProbs.length]);
+  }, [done, lessonId, score, problems.length]);
 
   function replay() {
-    const q = shuffle(allProbs);
+    const generated = generateProblems(lessonId, loadMathSettings());
+    setProblems(generated);
+    const q = shuffle(generated);
     setQueue(q);
     setScore(0);
     setDone(false);
@@ -326,7 +330,7 @@ export default function MathQuizPage() {
       <main className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: '#7DD3FC' }}>
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}><Emoji emoji="🎉" size={80} /></motion.div>
         <h2 className="text-3xl font-black text-white text-center">Brilliant!</h2>
-        <p className="text-white/70 font-semibold">{score}/{allProbs.length} correct</p>
+        <p className="text-white/70 font-semibold">{score}/{problems.length} correct</p>
         <div className="flex gap-1">
           {[1, 2, 3].map(i => (
             <motion.span key={i} initial={{ scale: 0, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ delay: i * 0.15, type: 'spring' }}>
@@ -343,8 +347,8 @@ export default function MathQuizPage() {
   }
 
   const current  = queue[0];
-  const answered = allProbs.length - queue.length;
-  const pct      = (answered / allProbs.length) * 100;
+  const answered = problems.length - queue.length;
+  const pct      = problems.length ? (answered / problems.length) * 100 : 0;
 
   return (
     <main className="h-dvh flex flex-col p-6 overflow-hidden" style={{ background: '#7DD3FC' }}>
@@ -352,7 +356,7 @@ export default function MathQuizPage() {
       <div className="flex items-center gap-3 mb-4">
         <button onClick={() => router.push('/math')} className="text-white text-2xl font-black w-10 h-10 flex items-center justify-center">←</button>
         <h1 className="text-lg font-black text-white flex-1 flex items-center gap-1.5"><Emoji emoji={lesson.emoji} size={20} /> {lesson.title} — Quiz</h1>
-        <div className="text-white font-bold text-sm">{answered}/{allProbs.length}</div>
+        <div className="text-white font-bold text-sm">{answered}/{problems.length}</div>
       </div>
 
       {/* Progress */}

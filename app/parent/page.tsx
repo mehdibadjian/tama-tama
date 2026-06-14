@@ -3,12 +3,49 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LESSONS, VOCAB } from '@/lib/seed-data';
+import { DEFAULT_MATH_SETTINGS, loadMathSettings, saveMathSettings } from '@/lib/math-data';
+import type { MathSettings } from '@/lib/math-data';
 import { Emoji } from '@/components/Emoji';
 import { getProgress } from '@/lib/progress';
 import type { VocabItem, LessonProgress } from '@/lib/types';
 
 const CUSTOM_KEY = 'tama-tama-custom-vocab';
 const PIN = '1234';
+
+// A labelled row of pick-one difficulty buttons for the math settings.
+function OptionRow({
+  label, emoji, hint, value, options, onChange,
+}: {
+  label: string;
+  emoji: string;
+  hint: string;
+  value: number;
+  options: number[];
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline gap-2">
+        <Emoji emoji={emoji} size={16} />
+        <span className="font-bold text-tama-ink text-sm">{label}</span>
+        <span className="text-tama-ink/40 text-xs">{hint}</span>
+      </div>
+      <div className="flex gap-2">
+        {options.map(o => (
+          <button
+            key={o}
+            onClick={() => onChange(o)}
+            className={`flex-1 py-2 rounded-xl font-black text-sm transition-colors ${
+              value === o ? 'bg-tama-purple text-white' : 'bg-tama-blue/15 text-tama-ink'
+            }`}
+          >
+            {o}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ParentPage() {
   const router = useRouter();
@@ -20,14 +57,24 @@ export default function ParentPage() {
   const [activeLesson, setActive]   = useState(1);
   const [form, setForm]             = useState({ hanzi: '', pinyin: '', english: '', emoji: '' });
   const [saved, setSaved]           = useState(false);
+  const [mathSettings, setMathSettings] = useState<MathSettings>(DEFAULT_MATH_SETTINGS);
 
   useEffect(() => {
     setProgress(getProgress());
+    setMathSettings(loadMathSettings());
     try {
       const stored = localStorage.getItem(CUSTOM_KEY);
       if (stored) setCustom(JSON.parse(stored));
     } catch { /* empty */ }
   }, []);
+
+  function updateMath(patch: Partial<MathSettings>) {
+    setMathSettings(prev => {
+      const next = { ...prev, ...patch };
+      saveMathSettings(next);
+      return next;
+    });
+  }
 
   function handleDigit(d: string) {
     if (d === '⌫') { setPin(p => p.slice(0, -1)); return; }
@@ -145,6 +192,47 @@ export default function ParentPage() {
               );
             })}
           </div>
+        </section>
+
+        {/* Math difficulty card */}
+        <section className="bg-white rounded-2xl p-5 mb-5 shadow-lg">
+          <h2 className="font-black text-tama-ink text-lg mb-1">Math Difficulty</h2>
+          <p className="text-tama-ink/50 text-xs font-semibold mb-4">
+            Tune the numbers to your child. Defaults are set for a 6-year-old. Changes apply on the next quiz.
+          </p>
+          <div className="flex flex-col gap-4">
+            <OptionRow
+              label="Addition" emoji="➕" hint="numbers up to"
+              value={mathSettings.addMax} options={[5, 10, 20]}
+              onChange={v => updateMath({ addMax: v })}
+            />
+            <OptionRow
+              label="Subtraction" emoji="➖" hint="numbers up to"
+              value={mathSettings.subMax} options={[5, 10, 20]}
+              onChange={v => updateMath({ subMax: v })}
+            />
+            <OptionRow
+              label="Multiplication" emoji="✖️" hint="times tables up to"
+              value={mathSettings.mulMax} options={[3, 5, 9]}
+              onChange={v => updateMath({ mulMax: v })}
+            />
+            <OptionRow
+              label="Division" emoji="➗" hint="numbers up to"
+              value={mathSettings.divMax} options={[3, 5, 9]}
+              onChange={v => updateMath({ divMax: v })}
+            />
+            <OptionRow
+              label="Questions" emoji="❓" hint="per quiz"
+              value={mathSettings.count} options={[5, 8, 10]}
+              onChange={v => updateMath({ count: v })}
+            />
+          </div>
+          <button
+            onClick={() => updateMath(DEFAULT_MATH_SETTINGS)}
+            className="mt-4 text-tama-purple/70 text-xs font-bold"
+          >
+            Reset to defaults (ages ~6)
+          </button>
         </section>
 
         {/* Add word card */}

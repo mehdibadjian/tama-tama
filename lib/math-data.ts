@@ -200,51 +200,127 @@ function prob(
   return { id, a, op, b, answer, rhyme, rhymePinyin };
 }
 
-export const MATH_PROBLEMS: Record<number, MathProblem[]> = {
-  // Addition — up to 100
-  1: [
-    prob(1,  1, '+',  2), prob(2,  4, '+',  3), prob(3,  7, '+',  6),
-    prob(4,  9, '+',  8), prob(5,  8, '+',  7), prob(6, 12, '+',  5),
-    prob(7, 15, '+',  8), prob(8, 14, '+', 17), prob(9, 23, '+', 14),
-    prob(10, 25, '+', 35), prob(11, 34, '+', 28), prob(12, 47, '+', 36),
-    prob(13, 52, '+', 38), prob(14, 64, '+', 27), prob(15, 45, '+', 48),
-  ],
-  // Subtraction — up to 100
-  2: [
-    prob(1,   8, '-',  3), prob(2,  12, '-',  7), prob(3,  15, '-',  8),
-    prob(4,  17, '-',  9), prob(5,  20, '-',  6), prob(6,  25, '-', 13),
-    prob(7,  32, '-', 17), prob(8,  40, '-', 24), prob(9,  50, '-', 23),
-    prob(10, 63, '-', 35), prob(11, 72, '-', 48), prob(12, 80, '-', 37),
-    prob(13, 85, '-', 46), prob(14, 91, '-', 45), prob(15, 100, '-', 42),
-  ],
-  // Multiplication — 九九表 2–7
-  3: [
-    prob(1,  2, '×', 2,  '二二得四',   'èr èr dé sì'),
-    prob(2,  2, '×', 3,  '二三得六',   'èr sān dé liù'),
-    prob(3,  2, '×', 4,  '二四得八',   'èr sì dé bā'),
-    prob(4,  2, '×', 5,  '二五一十',   'èr wǔ yī shí'),
-    prob(5,  3, '×', 3,  '三三得九',   'sān sān dé jiǔ'),
-    prob(6,  3, '×', 4,  '三四十二',   "sān sì shí'èr"),
-    prob(7,  3, '×', 5,  '三五十五',   'sān wǔ shíwǔ'),
-    prob(8,  4, '×', 4,  '四四十六',   'sì sì shíliù'),
-    prob(9,  4, '×', 5,  '四五二十',   'sì wǔ èrshí'),
-    prob(10, 5, '×', 5,  '五五二十五', 'wǔ wǔ èrshíwǔ'),
-    prob(11, 2, '×', 6,  '二六十二',   "èr liù shí'èr"),
-    prob(12, 3, '×', 6,  '三六十八',   'sān liù shíbā'),
-    prob(13, 4, '×', 6,  '四六二十四', 'sì liù èrshísì'),
-    prob(14, 5, '×', 6,  '五六三十',   'wǔ liù sānshí'),
-    prob(15, 3, '×', 7,  '三七二十一', 'sān qī èrshíyī'),
-    prob(16, 4, '×', 7,  '四七二十八', 'sì qī èrshíbā'),
-    prob(17, 5, '×', 7,  '五七三十五', 'wǔ qī sānshíwǔ'),
-    prob(18, 6, '×', 6,  '六六三十六', 'liù liù sānshíliù'),
-  ],
-  // Division — derived from multiplication table
-  4: [
-    prob(1,   4, '÷', 2), prob(2,   6, '÷', 2), prob(3,   8, '÷', 2),
-    prob(4,  10, '÷', 2), prob(5,   9, '÷', 3), prob(6,  12, '÷', 3),
-    prob(7,  15, '÷', 3), prob(8,  16, '÷', 4), prob(9,  20, '÷', 4),
-    prob(10, 25, '÷', 5), prob(11, 12, '÷', 2), prob(12, 18, '÷', 3),
-    prob(13, 24, '÷', 4), prob(14, 30, '÷', 5), prob(15, 18, '÷', 6),
-    prob(16, 21, '÷', 3), prob(17, 28, '÷', 4), prob(18, 35, '÷', 5),
-  ],
+// 九九 (nine-nine) song lines, keyed by "smaller×larger" so 5×2 reuses 2×5.
+// Used to attach a chant hint to generated multiplication problems.
+const NINE_NINE: Record<string, { rhyme: string; pinyin: string }> = {
+  '2x2': { rhyme: '二二得四',   pinyin: 'èr èr dé sì' },
+  '2x3': { rhyme: '二三得六',   pinyin: 'èr sān dé liù' },
+  '2x4': { rhyme: '二四得八',   pinyin: 'èr sì dé bā' },
+  '2x5': { rhyme: '二五一十',   pinyin: 'èr wǔ yī shí' },
+  '2x6': { rhyme: '二六十二',   pinyin: "èr liù shí'èr" },
+  '2x7': { rhyme: '二七十四',   pinyin: 'èr qī shísì' },
+  '2x8': { rhyme: '二八十六',   pinyin: 'èr bā shíliù' },
+  '2x9': { rhyme: '二九十八',   pinyin: 'èr jiǔ shíbā' },
+  '3x3': { rhyme: '三三得九',   pinyin: 'sān sān dé jiǔ' },
+  '3x4': { rhyme: '三四十二',   pinyin: "sān sì shí'èr" },
+  '3x5': { rhyme: '三五十五',   pinyin: 'sān wǔ shíwǔ' },
+  '3x6': { rhyme: '三六十八',   pinyin: 'sān liù shíbā' },
+  '3x7': { rhyme: '三七二十一', pinyin: 'sān qī èrshíyī' },
+  '3x8': { rhyme: '三八二十四', pinyin: 'sān bā èrshísì' },
+  '3x9': { rhyme: '三九二十七', pinyin: 'sān jiǔ èrshíqī' },
+  '4x4': { rhyme: '四四十六',   pinyin: 'sì sì shíliù' },
+  '4x5': { rhyme: '四五二十',   pinyin: 'sì wǔ èrshí' },
+  '4x6': { rhyme: '四六二十四', pinyin: 'sì liù èrshísì' },
+  '4x7': { rhyme: '四七二十八', pinyin: 'sì qī èrshíbā' },
+  '4x8': { rhyme: '四八三十二', pinyin: "sì bā sānshí'èr" },
+  '4x9': { rhyme: '四九三十六', pinyin: 'sì jiǔ sānshíliù' },
+  '5x5': { rhyme: '五五二十五', pinyin: 'wǔ wǔ èrshíwǔ' },
+  '5x6': { rhyme: '五六三十',   pinyin: 'wǔ liù sānshí' },
+  '5x7': { rhyme: '五七三十五', pinyin: 'wǔ qī sānshíwǔ' },
+  '5x8': { rhyme: '五八四十',   pinyin: 'wǔ bā sìshí' },
+  '5x9': { rhyme: '五九四十五', pinyin: 'wǔ jiǔ sìshíwǔ' },
+  '6x6': { rhyme: '六六三十六', pinyin: 'liù liù sānshíliù' },
+  '6x7': { rhyme: '六七四十二', pinyin: "liù qī sìshí'èr" },
+  '6x8': { rhyme: '六八四十八', pinyin: 'liù bā sìshíbā' },
+  '6x9': { rhyme: '六九五十四', pinyin: 'liù jiǔ wǔshísì' },
+  '7x7': { rhyme: '七七四十九', pinyin: 'qī qī sìshíjiǔ' },
+  '7x8': { rhyme: '七八五十六', pinyin: 'qī bā wǔshíliù' },
+  '7x9': { rhyme: '七九六十三', pinyin: 'qī jiǔ liùshísān' },
+  '8x8': { rhyme: '八八六十四', pinyin: 'bā bā liùshísì' },
+  '8x9': { rhyme: '八九七十二', pinyin: "bā jiǔ qīshí'èr" },
+  '9x9': { rhyme: '九九八十一', pinyin: 'jiǔ jiǔ bāshíyī' },
 };
+
+// ── Difficulty settings (parent-configurable, tuned for a 6-year-old) ─────────────
+
+export interface MathSettings {
+  addMax: number;   // addition: each number is 1..addMax
+  subMax: number;   // subtraction: the starting number is 2..subMax
+  mulMax: number;   // multiplication: times tables up to this number
+  divMax: number;   // division: divisor and quotient up to this number
+  count:  number;   // how many questions per quiz
+}
+
+export const DEFAULT_MATH_SETTINGS: MathSettings = {
+  addMax: 10,
+  subMax: 10,
+  mulMax: 5,
+  divMax: 5,
+  count:  8,
+};
+
+export const MATH_SETTINGS_KEY = 'tama-tama-math-settings';
+
+export function loadMathSettings(): MathSettings {
+  if (typeof window === 'undefined') return DEFAULT_MATH_SETTINGS;
+  try {
+    const raw = localStorage.getItem(MATH_SETTINGS_KEY);
+    if (raw) return { ...DEFAULT_MATH_SETTINGS, ...JSON.parse(raw) };
+  } catch { /* empty */ }
+  return DEFAULT_MATH_SETTINGS;
+}
+
+export function saveMathSettings(s: MathSettings): void {
+  try { localStorage.setItem(MATH_SETTINGS_KEY, JSON.stringify(s)); } catch { /* empty */ }
+}
+
+function rand(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Builds a fresh set of quiz problems for a lesson, sized and bounded by the
+// parent's difficulty settings. Avoids duplicate questions within a quiz.
+export function generateProblems(lessonId: number, s: MathSettings = DEFAULT_MATH_SETTINGS): MathProblem[] {
+  const want = Math.max(1, Math.min(20, Math.round(s.count)));
+  const seen = new Set<string>();
+  const out: MathProblem[] = [];
+  let guard = 0;
+
+  while (out.length < want && guard < want * 60) {
+    guard++;
+    let a: number, b: number;
+    let op: MathProblem['op'];
+    let rhyme: string | undefined;
+    let rhymePinyin: string | undefined;
+
+    if (lessonId === 1) {
+      op = '+';
+      a = rand(1, Math.max(1, s.addMax));
+      b = rand(1, Math.max(1, s.addMax));
+    } else if (lessonId === 2) {
+      op = '-';
+      a = rand(2, Math.max(2, s.subMax));
+      b = rand(1, a);                       // never goes below zero
+    } else if (lessonId === 3) {
+      op = '×';
+      const lo = Math.min(2, Math.max(1, s.mulMax));
+      a = rand(lo, Math.max(lo, s.mulMax));
+      b = rand(lo, Math.max(lo, s.mulMax));
+      const hit = NINE_NINE[`${Math.min(a, b)}x${Math.max(a, b)}`];
+      if (hit) { rhyme = hit.rhyme; rhymePinyin = hit.pinyin; }
+    } else {
+      op = '÷';
+      const d = rand(2, Math.max(2, s.divMax));   // divisor
+      const q = rand(1, Math.max(1, s.divMax));   // quotient
+      a = d * q;
+      b = d;
+    }
+
+    const key = `${a}${op}${b}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(prob(out.length + 1, a, op, b, rhyme, rhymePinyin));
+  }
+
+  return out;
+}
