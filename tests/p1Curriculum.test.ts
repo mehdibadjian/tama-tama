@@ -89,6 +89,16 @@ describe('Singapore P1 Curriculum & Logic Suite', () => {
     }
   });
 
+  test('the syllabus pays with a $2 coin as well, so children meet every circulating denomination', () => {
+    const orders = allQuestions()
+      .map(q => q.payload.moneyCanteen)
+      .filter(o => o !== undefined);
+
+    expect(orders.some(o => o.availableCoins.includes(200))).toBe(true);
+    expect(orders.some(o => o.itemPriceCents >= 200)).toBe(true);
+    expect(formatCents(200)).toBe('$2.00');
+  });
+
   test('Multiple choice payloads point at a real option', () => {
     const choices = allQuestions()
       .map(q => q.payload.multipleChoice)

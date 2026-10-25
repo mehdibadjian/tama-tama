@@ -1,8 +1,9 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { BagPackerPayload } from '@/lib/p1-curriculum-types';
 import { bagShelfItems, isBagItemValid } from '@/lib/p1-curriculum-logic';
+import { P1Draggable } from '@/components/P1Draggable';
 import { Emoji } from '@/components/Emoji';
 import { playChime, playRetry } from '@/lib/sfx';
 
@@ -29,6 +30,8 @@ export function P1BagPackerWidget({ bag, locked, onResult }: Props) {
   const [packed, setPacked] = useState<string[]>([]);
   const [rejected, setRejected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  const [carrying, setCarrying] = useState(false);
+  const bagRef = useRef<HTMLDivElement>(null);
 
   const needed = bag.validItems.length;
 
@@ -69,8 +72,8 @@ export function P1BagPackerWidget({ bag, locked, onResult }: Props) {
         ))}
       </div>
 
-      {/* The bag */}
-      <div className="relative">
+      {/* The bag — the drop target */}
+      <div ref={bagRef} className={`relative p-3 rounded-3xl transition-colors ${carrying ? 'bg-tama-pink/25' : ''}`}>
         <svg viewBox="0 0 120 130" className="w-28" role="img" aria-label="School bag">
           <path d="M40 22 Q60 4 80 22" fill="none" stroke="#A855F7" strokeWidth={7} strokeLinecap="round" />
           <rect x={14} y={22} width={92} height={96} rx={26} fill="#FF8EAF" stroke="#A855F7" strokeWidth={6} />
@@ -101,25 +104,33 @@ export function P1BagPackerWidget({ bag, locked, onResult }: Props) {
         {shelf.map(item => {
           const isPacked = packed.includes(item);
           return (
-            <motion.button
+            <motion.div
               key={item}
-              onClick={() => tap(item)}
-              disabled={locked || checked}
-              className={`flex items-center gap-2 rounded-2xl px-3 py-3 shadow border-4 text-left transition-colors ${
-                isPacked
-                  ? 'bg-tama-purple text-white border-tama-purple'
-                  : 'bg-white text-tama-ink border-transparent'
-              } disabled:opacity-50`}
               animate={rejected === item ? { x: [-8, 8, -6, 6, 0] } : {}}
               onAnimationComplete={() => { if (rejected === item) setRejected(null); }}
-              whileTap={{ scale: 0.94 }}
             >
-              <Emoji emoji={ITEM_EMOJI[item] ?? '🎒'} size={26} />
-              <span className="text-sm font-black leading-tight">{item}</span>
-            </motion.button>
+              <P1Draggable
+                targetRef={bagRef}
+                onDrop={() => tap(item)}
+                onTap={() => tap(item)}
+                onCarryChange={setCarrying}
+                disabled={locked || checked}
+                className={`w-full flex items-center gap-2 rounded-2xl px-3 py-3 shadow border-4 text-left transition-colors ${
+                  isPacked
+                    ? 'bg-tama-purple text-white border-tama-purple'
+                    : 'bg-white text-tama-ink border-transparent'
+                } disabled:opacity-50`}
+                ariaLabel={`${item} — drag into the bag or tap`}
+              >
+                <Emoji emoji={ITEM_EMOJI[item] ?? '🎒'} size={26} />
+                <span className="text-sm font-black leading-tight">{item}</span>
+              </P1Draggable>
+            </motion.div>
           );
         })}
       </div>
+
+      <p className="text-tama-ink/40 text-xs font-bold">Drag an item into the bag, or tap it. Tap again to take it out.</p>
 
       <motion.button
         onClick={checkBag}

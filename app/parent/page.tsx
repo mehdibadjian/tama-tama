@@ -7,6 +7,10 @@ import { DEFAULT_MATH_SETTINGS, loadMathSettings, saveMathSettings } from '@/lib
 import type { MathSettings } from '@/lib/math-data';
 import { Emoji } from '@/components/Emoji';
 import { getProgress } from '@/lib/progress';
+import { P1_CURRICULUM_DATA } from '@/lib/p1-curriculum-data';
+import { p1ParentSummary } from '@/lib/p1-parent';
+import { todayKey } from '@/lib/p1-progress';
+import { useP1Progress, usePetState } from '@/hooks/useP1Stores';
 import type { VocabItem, LessonProgress } from '@/lib/types';
 
 const CUSTOM_KEY = 'tama-tama-custom-vocab';
@@ -58,6 +62,8 @@ export default function ParentPage() {
   const [form, setForm]             = useState({ hanzi: '', pinyin: '', english: '', emoji: '' });
   const [saved, setSaved]           = useState(false);
   const [mathSettings, setMathSettings] = useState<MathSettings>(DEFAULT_MATH_SETTINGS);
+  const p1Progress = useP1Progress();
+  const pet = usePetState();
 
   useEffect(() => {
     setProgress(getProgress());
@@ -194,6 +200,28 @@ export default function ParentPage() {
           </div>
         </section>
 
+
+        {/* P1 School readiness */}
+        <section className="bg-white rounded-2xl p-5 mb-5 shadow-lg">
+          <h2 className="font-black text-tama-ink text-lg mb-1">P1 School · 小学堂</h2>
+          <p className="text-tama-ink/50 text-xs font-semibold mb-3">
+            Singapore MOE Primary 1 readiness · 🔥 {p1Progress.dailyStreak}-day streak · 🪙 {pet.starCoins} Star Coins
+          </p>
+          <div className="flex flex-col gap-2">
+            {p1ParentSummary(p1Progress, P1_CURRICULUM_DATA, todayKey()).map(row => (
+              <div key={row.trackId} className="flex items-center gap-2 text-sm">
+                <Emoji emoji={row.icon} size={22} />
+                <span className="font-semibold text-tama-ink flex-1 leading-tight">{row.title}</span>
+                <span className="text-tama-ink/40 text-xs font-bold">{row.plays}× played</span>
+                <span className="text-xs font-black text-tama-purple whitespace-nowrap">{row.stars} / 3 ⭐</span>
+                <span className="text-tama-ink/40 text-xs font-semibold w-[92px] text-right">{row.lastPlayed}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-tama-ink/35 text-[11px] font-semibold mt-3">
+            Science is not listed on purpose — MOE Primary Science begins in P3.
+          </p>
+        </section>
         {/* Math difficulty card */}
         <section className="bg-white rounded-2xl p-5 mb-5 shadow-lg">
           <h2 className="font-black text-tama-ink text-lg mb-1">Math Difficulty</h2>

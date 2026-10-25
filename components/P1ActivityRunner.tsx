@@ -181,7 +181,12 @@ export function P1ActivityRunner({ track }: Props) {
               <NumberBondWidget bond={numberBond} locked={solved} onResult={handleResult} />
             )}
             {moneyCanteen && (
-              <P1CoinTrayWidget order={moneyCanteen} locked={solved} onResult={handleResult} />
+              <P1CoinTrayWidget
+                order={moneyCanteen}
+                visual={question.targetVisual}
+                locked={solved}
+                onResult={handleResult}
+              />
             )}
             {multipleChoice && (
               <P1ChoiceWidget

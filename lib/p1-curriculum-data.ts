@@ -134,6 +134,20 @@ export const P1_CURRICULUM_DATA: P1ActivityTrack[] = [
         },
       },
       {
+        id: 'math_money_03',
+        type: 'singapore_money',
+        prompt: 'Pay $2.20 for a plate of chicken rice:',
+        audioPromptText: 'Tap coins to pay two dollars and twenty cents.',
+        targetVisual: '🍛',
+        payload: {
+          moneyCanteen: {
+            itemName: 'Chicken Rice',
+            itemPriceCents: 220,
+            availableCoins: [20, 50, 100, 200],
+          },
+        },
+      },
+      {
         id: 'math_money_02',
         type: 'singapore_money',
         prompt: 'Buy a warm cup of Milo for $1.20:',

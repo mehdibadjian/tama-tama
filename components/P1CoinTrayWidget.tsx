@@ -1,13 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { MoneyCanteenPayload } from '@/lib/p1-curriculum-types';
 import { coinsTotal, formatCents, judgePayment } from '@/lib/p1-curriculum-logic';
+import { P1Draggable } from '@/components/P1Draggable';
 import { Emoji } from '@/components/Emoji';
 import { playChime, playRetry } from '@/lib/sfx';
 
 interface Props {
   order: MoneyCanteenPayload;
+  visual?: string;
   locked: boolean;
   onResult: (correct: boolean) => void;
 }
@@ -40,10 +42,12 @@ function CoinFace({ cent, dimmed }: { cent: number; dimmed?: boolean }) {
 }
 
 /** Canteen counter: tap coins onto the tray, then pay the uncle or auntie. */
-export function P1CoinTrayWidget({ order, locked, onResult }: Props) {
+export function P1CoinTrayWidget({ order, visual = '🍽️', locked, onResult }: Props) {
   const [tray, setTray] = useState<number[]>([]);
   const [verdict, setVerdict] = useState<'exact' | 'short' | 'over' | null>(null);
   const [shaking, setShaking] = useState(false);
+  const [carrying, setCarrying] = useState(false);
+  const trayRef = useRef<HTMLDivElement>(null);
 
   const paid = coinsTotal(tray);
 
@@ -73,7 +77,7 @@ export function P1CoinTrayWidget({ order, locked, onResult }: Props) {
     <div className="flex flex-col items-center gap-4 w-full">
       {/* The order */}
       <div className="flex items-center gap-3 bg-tama-blue/15 rounded-2xl px-4 py-2">
-        <Emoji emoji={order.itemName.includes('Noodle') ? '🍜' : '☕'} size={30} />
+        <Emoji emoji={visual} size={30} />
         <div>
           <p className="font-black text-tama-ink leading-tight">{order.itemName}</p>
           <p className="text-tama-ink/60 text-xs font-bold">Target: {formatCents(order.itemPriceCents)}</p>
@@ -82,12 +86,14 @@ export function P1CoinTrayWidget({ order, locked, onResult }: Props) {
 
       {/* Tray */}
       <motion.div
-        className="w-full max-w-xs min-h-[92px] bg-white rounded-2xl border-4 border-dashed border-tama-purple/30 p-3 flex flex-wrap gap-2 items-center justify-center"
-        animate={shaking ? { x: [-8, 8, -6, 6, 0] } : {}}
+        ref={trayRef}
+        className="w-full max-w-xs min-h-[92px] bg-white rounded-2xl border-4 border-dashed p-3 flex flex-wrap gap-2 items-center justify-center"
+        style={{ borderColor: carrying ? '#FF8EAF' : 'rgba(168, 85, 247, 0.3)' }}
+        animate={shaking ? { x: [-8, 8, -6, 6, 0] } : carrying ? { scale: 1.02 } : { scale: 1 }}
         onAnimationComplete={() => setShaking(false)}
       >
         {tray.length === 0 && (
-          <span className="text-tama-ink/30 text-sm font-bold">Tray is empty — tap coins below</span>
+          <span className="text-tama-ink/30 text-sm font-bold">Tray is empty — drag coins here, or tap them</span>
         )}
         {tray.map((cent, i) => (
           <motion.button
@@ -116,16 +122,18 @@ export function P1CoinTrayWidget({ order, locked, onResult }: Props) {
       {/* Coin purse */}
       <div className="flex gap-2 flex-wrap justify-center">
         {order.availableCoins.map(cent => (
-          <motion.button
+          <P1Draggable
             key={cent}
-            onClick={() => addCoin(cent)}
+            targetRef={trayRef}
+            onDrop={() => addCoin(cent)}
+            onTap={() => addCoin(cent)}
+            onCarryChange={setCarrying}
             disabled={locked || verdict === 'exact'}
             className="disabled:opacity-40"
-            whileTap={{ scale: 0.88 }}
-            aria-label={`Add ${formatCents(cent)}`}
+            ariaLabel={`Add ${formatCents(cent)} — drag onto the tray or tap`}
           >
             <CoinFace cent={cent} />
-          </motion.button>
+          </P1Draggable>
         ))}
       </div>
 

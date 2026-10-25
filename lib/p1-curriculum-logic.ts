@@ -62,6 +62,35 @@ export function isBagItemValid(item: string, bag: BagPackerPayload): boolean {
   return bag.validItems.includes(item);
 }
 
+/** A rectangle in viewport pixels, straight from getBoundingClientRect(). */
+export interface DropTargetRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Did a dragged coin / school item land on the tray or bag?
+ *
+ * A child's finger rarely stops dead-centre, so the target is padded outward by
+ * `tolerancePx` — dropping just short of the tray still counts.
+ */
+export function didLandOnTarget(
+  x: number,
+  y: number,
+  target: DropTargetRect,
+  tolerancePx = 24,
+): boolean {
+  const pad = Math.max(0, tolerancePx);
+  return (
+    x >= target.left - pad &&
+    x <= target.left + target.width + pad &&
+    y >= target.top - pad &&
+    y <= target.top + target.height + pad
+  );
+}
+
 export function shuffled<T>(arr: T[]): T[] {
   const out = [...arr];
   for (let i = out.length - 1; i > 0; i--) {
