@@ -18,6 +18,24 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Learning tracks
+
+| Entry point | Route | What it covers |
+|---|---|---|
+| 🈶 Mandarin | `/map` | Hanzi flash-match and finger tracing lessons |
+| 🧮 心算 Math | `/math` | Abacus mental math, nine-nine song |
+| 🎒 P1 School | `/p1-school` | Singapore MOE Primary 1 readiness: English (STELLAR), Math (CPA number bonds + SG coins), 华文 Mother Tongue, PAL school life |
+
+P1 progress, the daily streak, and the pet's wisdom / happiness / energy / Star Coins are kept in
+`localStorage` (`tama-tama-p1-progress`, `tama-tama-pet`). There is deliberately no Science track —
+the MOE Primary Science syllabus starts in P3.
+
+## Tests
+
+```bash
+pnpm test        # P1 curriculum and reward-logic suite (Vitest)
+```
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

@@ -5,9 +5,13 @@ interface Props {
   size?: number;
   bounce?: boolean;
   className?: string;
+  /** Singapore school uniform: white collar + red tie, for the P1 School hub. */
+  uniform?: boolean;
+  /** Raises a paw and waves. Loop it on greeting screens. */
+  wave?: boolean;
 }
 
-export function TamaCharacter({ size = 200, bounce = false, className = '' }: Props) {
+export function TamaCharacter({ size = 200, bounce = false, className = '', uniform = false, wave = false }: Props) {
   return (
     <motion.div
       className={className}
@@ -51,6 +55,27 @@ export function TamaCharacter({ size = 200, bounce = false, className = '' }: Pr
           strokeWidth="12"
           strokeLinejoin="round"
         />
+
+        {/* Waving paw, pivoting at the shoulder */}
+        {wave && (
+          <motion.g
+            style={{ transformBox: 'fill-box', transformOrigin: '0% 100%' }}
+            animate={{ rotate: [0, -18, 6, -18, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', delay: 0.4 }}
+          >
+            <path d="M 372 300 Q 400 268 416 240" fill="none" stroke="#A855F7" strokeWidth="30" strokeLinecap="round" />
+            <path d="M 372 300 Q 400 268 416 240" fill="none" stroke="#FF8EAF" strokeWidth="20" strokeLinecap="round" />
+          </motion.g>
+        )}
+
+        {/* School uniform: white collar and red tie */}
+        {uniform && (
+          <g>
+            <path d="M 216 336 L 256 366 L 296 336 L 296 318 L 216 318 Z" fill="#FFFFFF" stroke="#334155" strokeWidth="6" strokeLinejoin="round" />
+            <path d="M 256 348 L 244 366 L 256 412 L 268 366 Z" fill="#EF4444" stroke="#334155" strokeWidth="5" strokeLinejoin="round" />
+            <path d="M 246 342 L 266 342 L 262 352 L 250 352 Z" fill="#B91C1C" />
+          </g>
+        )}
       </svg>
     </motion.div>
   );
