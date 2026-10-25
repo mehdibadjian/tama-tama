@@ -80,7 +80,7 @@ export function P1ActivityRunner({ track }: Props) {
     return (
       <main className="min-h-screen bg-tama-blue flex flex-col items-center justify-center gap-5 p-8">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.6 }}>
-          <TamaCharacter size={180} uniform />
+          <TamaCharacter size={180} uniform wave />
         </motion.div>
 
         <motion.p

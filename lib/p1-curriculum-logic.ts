@@ -82,9 +82,18 @@ export function bagShelfItems(bag: BagPackerPayload): string[] {
  */
 export function starsForAttempt(total: number, missedFirstTry: number): number {
   if (total <= 0) return 1;
-  if (missedFirstTry === 0) return 3;
+  if (missedFirstTry === 0) return P1_MAX_STARS;
   if (missedFirstTry <= Math.floor(total / 3)) return 2;
   return 1;
+}
+
+/** A track is always scored out of three stars, on the card and on the result screen. */
+export const P1_MAX_STARS = 3;
+
+/** Hub card completion badge, e.g. "2 / 3 Completed". */
+export function p1StarBadge(starsEarned: number): string {
+  const stars = Math.max(0, Math.min(P1_MAX_STARS, Math.round(starsEarned)));
+  return `${stars} / ${P1_MAX_STARS} Completed`;
 }
 
 /**

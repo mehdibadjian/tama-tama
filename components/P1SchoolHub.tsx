@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { P1_CURRICULUM_DATA } from '@/lib/p1-curriculum-data';
+import { p1StarBadge } from '@/lib/p1-curriculum-logic';
 import { Emoji } from '@/components/Emoji';
 import { TamaCharacter } from '@/components/TamaCharacter';
 import { P1PetStats } from '@/components/P1PetStats';
@@ -40,7 +41,7 @@ export function P1SchoolHub() {
 
         {/* Pet + streak header */}
         <div className="bg-white rounded-3xl p-4 shadow-lg mb-5 flex items-center gap-4">
-          <TamaCharacter size={84} uniform bounce />
+          <TamaCharacter size={84} uniform wave bounce />
           <div className="flex-1">
             <motion.p
               initial={{ scale: 0.9, opacity: 0 }}
@@ -60,7 +61,6 @@ export function P1SchoolHub() {
         <div className="grid grid-cols-2 gap-3 mb-5">
           {P1_CURRICULUM_DATA.map((track, i) => {
             const record = progress.completedActivityIds[track.id];
-            const played = (record?.count ?? 0) > 0;
 
             return (
               <motion.button
@@ -80,10 +80,9 @@ export function P1SchoolHub() {
                     {track.description}
                   </p>
                 </div>
-                <div className="mt-auto flex items-center gap-2">
-                  <span className="text-sm">
-                    {played ? '⭐'.repeat(record?.starsEarned ?? 1) : <span className="text-white/60 text-xs font-black">NEW</span>}
-                  </span>
+                <div className="mt-auto flex items-center gap-1.5">
+                  <Emoji emoji="⭐" size={14} />
+                  <span className="text-[11px] font-black">{p1StarBadge(record?.starsEarned ?? 0)}</span>
                   <span className="text-white/80 text-[11px] font-black ml-auto">
                     {track.questions.length} questions
                   </span>

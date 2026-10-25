@@ -7,9 +7,11 @@ interface Props {
   className?: string;
   /** Singapore school uniform: white collar + red tie, for the P1 School hub. */
   uniform?: boolean;
+  /** Raises a paw and waves. Loop it on greeting screens. */
+  wave?: boolean;
 }
 
-export function TamaCharacter({ size = 200, bounce = false, className = '', uniform = false }: Props) {
+export function TamaCharacter({ size = 200, bounce = false, className = '', uniform = false, wave = false }: Props) {
   return (
     <motion.div
       className={className}
@@ -53,6 +55,18 @@ export function TamaCharacter({ size = 200, bounce = false, className = '', unif
           strokeWidth="12"
           strokeLinejoin="round"
         />
+
+        {/* Waving paw, pivoting at the shoulder */}
+        {wave && (
+          <motion.g
+            style={{ transformBox: 'fill-box', transformOrigin: '0% 100%' }}
+            animate={{ rotate: [0, -18, 6, -18, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', delay: 0.4 }}
+          >
+            <path d="M 372 300 Q 400 268 416 240" fill="none" stroke="#A855F7" strokeWidth="30" strokeLinecap="round" />
+            <path d="M 372 300 Q 400 268 416 240" fill="none" stroke="#FF8EAF" strokeWidth="20" strokeLinecap="round" />
+          </motion.g>
+        )}
 
         {/* School uniform: white collar and red tie */}
         {uniform && (
