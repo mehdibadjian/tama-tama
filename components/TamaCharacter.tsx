@@ -5,9 +5,11 @@ interface Props {
   size?: number;
   bounce?: boolean;
   className?: string;
+  /** Singapore school uniform: white collar + red tie, for the P1 School hub. */
+  uniform?: boolean;
 }
 
-export function TamaCharacter({ size = 200, bounce = false, className = '' }: Props) {
+export function TamaCharacter({ size = 200, bounce = false, className = '', uniform = false }: Props) {
   return (
     <motion.div
       className={className}
@@ -51,6 +53,15 @@ export function TamaCharacter({ size = 200, bounce = false, className = '' }: Pr
           strokeWidth="12"
           strokeLinejoin="round"
         />
+
+        {/* School uniform: white collar and red tie */}
+        {uniform && (
+          <g>
+            <path d="M 216 336 L 256 366 L 296 336 L 296 318 L 216 318 Z" fill="#FFFFFF" stroke="#334155" strokeWidth="6" strokeLinejoin="round" />
+            <path d="M 256 348 L 244 366 L 256 412 L 268 366 Z" fill="#EF4444" stroke="#334155" strokeWidth="5" strokeLinejoin="round" />
+            <path d="M 246 342 L 266 342 L 262 352 L 250 352 Z" fill="#B91C1C" />
+          </g>
+        )}
       </svg>
     </motion.div>
   );

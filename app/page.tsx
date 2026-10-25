@@ -7,7 +7,7 @@ import { useSpeech } from '@/hooks/useSpeech';
 
 export default function SplashPage() {
   const router = useRouter();
-  const { speakEnglish } = useSpeech();
+  const { speak, speakEnglish } = useSpeech();
 
   function handleMandarin() {
     // Required user gesture to unlock AudioContext for the session
@@ -18,6 +18,11 @@ export default function SplashPage() {
   function handleMath() {
     speakEnglish("Let's do Chinese mental math!");
     router.push('/math');
+  }
+
+  function handleP1School() {
+    speak("Welcome to P1 School! Let's get ready for Primary One!", 'en-SG');
+    router.push('/p1-school');
   }
 
   return (
@@ -64,6 +69,15 @@ export default function SplashPage() {
           whileTap={{ scale: 0.93 }}
         >
           <Emoji emoji="🧮" size={26} /> 心算 Math
+        </motion.button>
+
+        <motion.button
+          onClick={handleP1School}
+          className="text-white text-xl font-black py-5 rounded-2xl shadow-2xl flex items-center justify-center gap-3"
+          style={{ backgroundColor: '#A855F7' }}
+          whileTap={{ scale: 0.93 }}
+        >
+          <Emoji emoji="🎒" size={26} /> P1 School · 小学堂
         </motion.button>
       </motion.div>
 
